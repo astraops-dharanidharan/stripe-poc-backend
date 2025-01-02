@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, RawBodyRequest } from '@nestjs/common';
 import Stripe from 'stripe';
+import {v4 as uuidv4} from 'uuid';
 
 @Injectable()
 export class StripeService {
@@ -46,11 +47,17 @@ export class StripeService {
     return product.id;
   }
 
-  async createPrice(productId: string,amount: number, currency: string): Promise<string> {
+  async createPrice(productId: string,amount: number, currency: string, interval: Stripe.Price.Recurring.Interval, productName: string): Promise<string> {
     const price = await this.stripe.prices.create({
       unit_amount: amount, // Price in cents (e.g., 1000 = $10.00)
       currency,
       product: productId,
+      recurring: {
+        interval: interval,
+      },
+      product_data:{
+        name:  productName,
+      }
     });
     return price.id;
   }
@@ -106,7 +113,18 @@ export class StripeService {
     }
   }
 
-  async createCheckoutSession(customerId: string, priceId: string, quantity: number) {
+  async  attachPaymentMethod(customerId: string, paymentMethodId: string) {
+    await this.stripe.paymentMethods.attach(paymentMethodId, { customer: customerId });
+    await this.stripe.customers.update(customerId, {
+      invoice_settings: {
+        default_payment_method: paymentMethodId,
+      },
+    });
+  
+    return 'Payment method attached successfully';
+  }
+
+  async createCheckoutSession(customerId: string, priceId: string, quantity: number, userDetails: any, stripeProductId: string) {
     return await this.stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       customer: customerId,
@@ -116,11 +134,43 @@ export class StripeService {
           quantity: quantity,
         },
       ],
-      mode: 'payment',
+      mode: 'subscription',
       success_url: 'http://localhost:5173/purchase',
       cancel_url: 'http://localhost:5173/purchase',
+      metadata: {
+        orderId: uuidv4(),
+        priceId: priceId,
+        stripeProductId,
+        ...userDetails
+      },
     });
   }
-  
+
+  async createSubscription(customerId: string, priceId: string, stripeProductId: string) {
+    return await this.stripe.subscriptions.create({
+      customer: customerId,
+      items: [{ price: priceId }],
+      metadata: {
+        stripeProductId: stripeProductId,
+      },
+    });
+  }
+
+  async getPaymentMethodId(paymentIntentId: string) {
+    const paymentIntent = await this.stripe.paymentIntents.retrieve(paymentIntentId);
+    return paymentIntent.payment_method;
+  }
+
+  constructEvent(body:any, signature: string, endpointSecret: string) {
+    try {
+      console.log(body, "body");
+      console.log(signature, "signature");
+      console.log(endpointSecret, "endpointSecret");
+      return this.stripe.webhooks.constructEvent(body, signature, endpointSecret);
+    } catch (err) {
+      console.log(err.message, "err");
+      throw new Error('Webhook signature verification failed');
+    }
+  }
   
 }

@@ -1,5 +1,5 @@
 import { IsString, IsNumber, IsArray, IsBoolean, ArrayMinSize, IsOptional } from 'class-validator';
-
+import { Stripe } from 'stripe';
 export class CreateProductDto {
   @IsString()
   name: string;
@@ -21,4 +21,12 @@ export class CreateProductDto {
   @IsString()
   @IsOptional()
   currency: string;
+
+  @IsString()
+  @IsOptional()
+  interval: Stripe.Price.Recurring.Interval;
+
+  @IsString()
+  @IsOptional()
+  productName: string;
 }

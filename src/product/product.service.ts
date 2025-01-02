@@ -20,7 +20,7 @@ export class ProductService {
         throw new ConflictException('Product already exists');
       }
       const stripeProductId = await this.stripeService.createProduct(createProductDto.name, createProductDto.description);
-      const stripePriceId = await this.stripeService.createPrice(stripeProductId, createProductDto.price, createProductDto.currency || 'usd');
+      const stripePriceId = await this.stripeService.createPrice(stripeProductId, createProductDto.price, createProductDto.currency || 'usd', createProductDto.interval || 'month', createProductDto.name);
       const product = await this.productModel.create({...createProductDto, stripeProductId,stripePriceId});
 
       return product;

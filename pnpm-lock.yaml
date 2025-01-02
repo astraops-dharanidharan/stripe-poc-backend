@@ -35,6 +35,9 @@ importers:
       bcrypt:
         specifier: ^5.1.1
         version: 5.1.1
+      body-parser:
+        specifier: ^1.20.3
+        version: 1.20.3
       class-transformer:
         specifier: ^0.5.1
         version: 0.5.1
@@ -59,6 +62,9 @@ importers:
       stripe:
         specifier: ^17.5.0
         version: 17.5.0
+      uuid:
+        specifier: ^11.0.3
+        version: 11.0.3
     devDependencies:
       '@nestjs/cli':
         specifier: ^10.0.0
@@ -2968,6 +2974,10 @@ packages:
   utils-merge@1.0.1:
     resolution: {integrity: sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==}
     engines: {node: '>= 0.4.0'}
+
+  uuid@11.0.3:
+    resolution: {integrity: sha512-d0z310fCWv5dJwnX1Y/MncBAqGMKEzlBb1AOf7z9K8ALnd0utBX/msg/fA0+sbyN1ihbMsLhrBlnl1ak7Wa0rg==}
+    hasBin: true
 
   v8-compile-cache-lib@3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}
@@ -6392,6 +6402,8 @@ snapshots:
   util-deprecate@1.0.2: {}
 
   utils-merge@1.0.1: {}
+
+  uuid@11.0.3: {}
 
   v8-compile-cache-lib@3.0.1: {}
 
