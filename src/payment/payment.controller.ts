@@ -42,7 +42,6 @@ export class PaymentController {
     const { customerId, priceId , quantity} = body;
 
     const session = await this.stripeService.createCheckoutSession(customerId, priceId, quantity);
-    console.log(session);
     return { sessionId: session.id, redirectUrl: session.url };
   }
 

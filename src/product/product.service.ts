@@ -79,8 +79,6 @@ export class ProductService {
       }
 
       if (product.stripeProductId) {
-      console.log(product);
-
         await this.stripeService.deleteProduct(product.stripeProductId);
       }
       return product;

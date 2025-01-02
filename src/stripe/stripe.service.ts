@@ -100,11 +100,8 @@ export class StripeService {
 
       // Then, delete the product
       const deletedProduct = await this.stripe.products.update(productId, { active: false });
-      console.log(deletedProduct);
-
       return deletedProduct;
     } catch (error) {
-      console.log(error);
       throw new Error(`Error deleting product from Stripe: ${error.message}`);
     }
   }
