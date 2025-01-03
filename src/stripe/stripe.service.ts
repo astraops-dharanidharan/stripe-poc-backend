@@ -125,6 +125,7 @@ export class StripeService {
   }
 
   async createCheckoutSession(customerId: string, priceId: string, quantity: number, userDetails: any, stripeProductId: string) {
+    console.log(stripeProductId, "stripeProductId");  
     return await this.stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       customer: customerId,
@@ -146,12 +147,12 @@ export class StripeService {
     });
   }
 
-  async createSubscription(customerId: string, priceId: string, stripeProductId: string) {
+  async createSubscription(customerId: string, priceId: string, metadata: any) {
     return await this.stripe.subscriptions.create({
       customer: customerId,
       items: [{ price: priceId }],
       metadata: {
-        stripeProductId: stripeProductId,
+        ...metadata
       },
     });
   }
@@ -170,6 +171,24 @@ export class StripeService {
     } catch (err) {
       console.log(err.message, "err");
       throw new Error('Webhook signature verification failed');
+    }
+  }
+
+  async getSubscription(subscriptionId: string) {
+    try {
+      return await this.stripe.subscriptions.retrieve(subscriptionId);
+    } catch (error) {
+      throw new Error(`Error retrieving subscription: ${error.message}`);
+    }
+  }
+
+  async updateMetadataToSubscription(subscription: any, metadata: any) {
+    try {
+      return await this.stripe.subscriptions.update(subscription, {
+        metadata: metadata,
+      });
+    } catch (error) {
+      throw new Error(`Error updating subscription metadata: ${error.message}`);
     }
   }
   

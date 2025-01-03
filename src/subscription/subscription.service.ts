@@ -1,12 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { StripeService } from 'src/stripe/stripe.service';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Subscription, SubscriptionDocument } from './schema/subscription.schema';
+
 @Injectable()
 export class SubscriptionService {
-    constructor(private readonly stripeService: StripeService) {}
+    constructor(
+        private readonly stripeService: StripeService,
+        @InjectModel(Subscription.name)
+        private subscriptionModel: Model<SubscriptionDocument>,
+    ) {}
 
-    async createSubscription(customerId: string,  priceId: string, stripeProductId: string) {
-        const subscription = await this.stripeService.createSubscription(customerId, priceId, stripeProductId);
-        console.log(subscription, "subscription");
-        return subscription;
+    async addSubscription(customerId: string,  priceId: string, metadata: any, subscriptionId: string) {
+        const {userId, status} = metadata
+        // Create subscription in our database
+        const subscription = new this.subscriptionModel({
+            stripeSubscriptionId: subscriptionId,
+            userId: userId,
+            stripeCustomerId: customerId,
+            planId: priceId,
+            status: status,
+        });
+
+        return await subscription.save();
     }
 }

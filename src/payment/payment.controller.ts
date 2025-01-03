@@ -70,28 +70,32 @@ export class PaymentController {
     // Handle the event after payment is successful
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
-      const { customer, metadata, payment_intent, subscription } = session;
-      console.log(session, "session");
-      
-      const subscription2 = await this.subscriptionService.createSubscription(customer, metadata.priceId, metadata.stripeProductId);
-      console.log(subscription2, "subscription2");
+      const { metadata, subscription } = session;
+
+      //updating the metadata to the subscription object
+      if(subscription){
+        await this.stripeService.updateMetadataToSubscription(subscription, metadata);
+      }
     }
 
     console.log(event.type, "event.type");
     if (event.type === 'invoice.payment_succeeded') {
       const invoice = event.data.object
-      const payment_intent = invoice.payment_intent as string;
-      console.log(payment_intent, "payment_intent");
-      console.log(invoice, "invoice");
+      const {customer, payment_intent, subscription: subscriptionId} = invoice
+
+      //get subscription details and metadata of the customer and plan details
+      const subscription = await this.stripeService.getSubscription(subscriptionId)
+
+      //get payment method id
       const paymentMethodId = await this.stripeService.getPaymentMethodId(payment_intent)
-      console.log(paymentMethodId, "paymentMethodId");
-      await this.stripeService.attachPaymentMethod(invoice.customer as string, paymentMethodId as string);
-      // const customerId = invoice.customer as string;
-      // console.log('Default payment method updated:', paymentMethodId, invoice);
-      // // Update the default payment method for the customer
-      // await this.stripeService.attachPaymentMethod(customerId, 
-      //   paymentMethodId
-      // );
+
+      //attach payment method as default to customer
+      await this.stripeService.attachPaymentMethod(customer as string, paymentMethodId as string);
+
+      const { metadata} = subscription
+
+      //create subscription and update the details in the database
+      await this.subscriptionService.addSubscription(customer, metadata.priceId, metadata, subscriptionId);
     
       
     }
