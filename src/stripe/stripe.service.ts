@@ -125,8 +125,8 @@ export class StripeService {
   }
 
   async createCheckoutSession(customerId: string, priceId: string, quantity: number, userDetails: any, stripeProductId: string) {
-    console.log(stripeProductId, "stripeProductId");  
     return await this.stripe.checkout.sessions.create({
+      ui_mode: 'embedded',
       payment_method_types: ['card'],
       customer: customerId,
       line_items: [
@@ -138,6 +138,7 @@ export class StripeService {
       mode: 'subscription',
       success_url: 'http://localhost:5173/purchase',
       cancel_url: 'http://localhost:5173/purchase',
+      return_url: 'http://localhost:5173/purchase',
       metadata: {
         orderId: uuidv4(),
         priceId: priceId,

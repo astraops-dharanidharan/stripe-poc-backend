@@ -52,7 +52,7 @@ export class PaymentController {
     const userDetails ={name, userId, email}
 
     const session = await this.stripeService.createCheckoutSession(customerId, priceId, quantity, userDetails, stripeProductId);
-    return { sessionId: session.id, redirectUrl: session.url };
+    return { sessionId: session.id, redirectUrl: session.url, clientSecret: session.client_secret  };
   }
 
   @Post('webhook')
