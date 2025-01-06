@@ -136,9 +136,9 @@ export class StripeService {
         },
       ],
       mode: 'subscription',
-      success_url: 'http://localhost:5173/purchase',
-      cancel_url: 'http://localhost:5173/purchase',
-      return_url: 'http://localhost:5173/purchase',
+      // success_url: 'http://localhost:5173/purchase',
+      // cancel_url: 'http://localhost:5173/purchase',
+      return_url: 'http://localhost:5173/stripe-embed',
       metadata: {
         orderId: uuidv4(),
         priceId: priceId,
